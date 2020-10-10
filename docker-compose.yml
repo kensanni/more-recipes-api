@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: more-recipes
+    ports:
+      - 9000:5432
+    volumes:
+      - recipes-data:/var/lib/postgresql/data
+
+volumes:
+  recipes-data:
+
+# postgres://postgres:secret@localhost:9000/test_db?sslmode=disable
