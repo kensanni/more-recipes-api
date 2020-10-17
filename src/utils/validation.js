@@ -1,6 +1,7 @@
 import { body, check, validationResult } from 'express-validator';
-import { signInUser } from '../controllers/user';
 import query from '../db/query';
+import { signInUserQuery } from '../db/queries';
+
 
 
 const validateUserInputRules = [
@@ -25,6 +26,31 @@ const validateUserInputRules = [
   body("image")
     .notEmpty()
     .withMessage("Image field is required")
+    .trim()
+]
+
+const validateRecipesInputRules = [
+  body("name")
+    .notEmpty()
+    .withMessage("Name field cannot be empty")
+    .matches(/^[A-Za-z0-9][^ ]+( [^]+)*$/, "g")
+    .withMessage("Name field contains invalid character")
+    .trim(),
+  body("description")
+    .notEmpty()
+    .withMessage("description field cannot be empty")
+    .matches(/^[A-Za-z0-9][^ ]+( [^]+)*$/, "g")
+    .withMessage("description field contains invalid characters")
+    .trim(),
+  body("ingredient")
+    .notEmpty()
+    .withMessage("ingredient field cannot be empty")
+    .trim(),
+  body("image")
+    .notEmpty()
+    .withMessage("Image field can't be empty")
+    .isURL()
+    .withMessage("Image URL not valid")
     .trim()
 ]
 
@@ -62,7 +88,6 @@ const validateUserSignIn = async (req, res, next) => {
   }
 
   const user = username ? username : email
-  const signInUserQuery = 'SELECT * FROM users where ((email = $1) OR (username = $1))';
 
   try {
     const signIn = await query.sqlQuery(signInUserQuery, [user])
@@ -84,9 +109,22 @@ const validateUserSignIn = async (req, res, next) => {
   }
 }
 
+// const validateCreateRecipes = async (req, res, next) => {
+//   const { 
+//     name, description, ingredient, image
+//   } = req.body;
+
+//   try {
+//     const 
+//   } catch (error) {
+    
+//   }
+// }
+
 
 export {
   validateUserInputRules,
   validateUserSignIn,
+  validateRecipesInputRules,
   validate,
 }

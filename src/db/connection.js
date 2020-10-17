@@ -7,7 +7,7 @@ pool.on('connect', () => {
 const createUserTable = () => {
   
   const createUserTableQuery = `
-    CREATE TYPE roles AS ENUM ('user', 'admin', 'superAdmin');
+    CREATE TYPE IF NOT EXISTS roles AS ENUM ('user', 'admin', 'superAdmin');
     CREATE TABLE IF NOT EXISTS users
     (id serial PRIMARY KEY,
     name VARCHAR(50) NOT NULL
@@ -41,13 +41,45 @@ const dropUserTable = () => {
 
 };
 
+const createRecipesTable = () => {
+  const createRecipesTableQuery = `
+    CREATE TABLE IF NOT EXISTS recipes (
+    id serial PRIMARY KEY,
+    user_id int NOT NULL,
+    name VARCHAR(50) NOT NULL CHECK(length(name) > 0),
+    description TEXT NOT NULL CHECK(length(description) > 0),
+    ingredients TEXT[] NOT NULL,
+    views INT default '0',
+    image VARCHAR(255) NOT NULL CHECK(length(image) > 0),
+    created_on DATE NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    )`;
+  
+  pool.query(createRecipesTableQuery).then((res) => {
+    console.log(res);
+    pool.end()
+  });
+  
+}
+
+const dropRecipesTable = () => {
+  const dropRecipesTableQuery = 'DROP TABLE IF EXISTS recipes';
+
+  pool.query(dropRecipesTableQuery).then((res) => {
+    console.log(res);
+    pool.end();
+  });
+
+};
 
 const createAllTables = () => {
   createUserTable();
+  createRecipesTable();
 };
 
 const dropAllTables = () => {
  dropUserTable();
+ dropRecipesTable();
 };
 
 
